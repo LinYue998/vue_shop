@@ -4,6 +4,7 @@ import router from './router'
 import './plugins/element.js'
 import './assets/css/reset.css'
 import './assets/css/base.css'
+import 'default-passive-events'
 // 将封装后的axios导入
 import service from './assets/js/service.js'
 //引入font-awesome的图标样式

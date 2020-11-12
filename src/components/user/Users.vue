@@ -54,8 +54,9 @@
                         <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row.id)"></el-button>
                         <!-- 删除用户按钮 -->
                         <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)"></el-button>
+                        <!-- 分配角色按钮 -->
                         <el-tooltip class="item" effect="dark" content="分配角色" placement="top" :enterable="false">
-                            <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+                            <el-button type="warning" icon="el-icon-setting" size="mini" @click="setAllotDialog(scope.row)"></el-button>
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -120,6 +121,30 @@
                     <el-button @click="editDialogVisible = false">取 消</el-button>
                     <el-button type="primary" @click="editUserInfo">确 定</el-button>
                 </span>
+            </el-dialog>
+            <!-- 分配角色 -->
+            <el-dialog
+            title="分配角色"
+            :visible.sync="allotUserDialogVisible"
+            width="40%">
+            <div class="user_tit">
+                <p>当前的用户:&nbsp;{{userInfo.username}}</p>
+                <p>当前的角色:&nbsp;{{userInfo.role_name}}</p>
+                <p>分配新角色:
+                    <el-select v-model="setNewUserId" placeholder="请选择新角色">
+                        <el-option
+                        v-for="item in allUserList"
+                        :key="item.id"
+                        :label="item.roleName"
+                        :value="item.id">
+                        </el-option>
+                    </el-select>
+                </p>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="allotUserDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveRoleName">确 定</el-button>
+            </span>
             </el-dialog>
         </el-card>
     </div>
@@ -196,7 +221,7 @@ export default {
             // 控制修改用户信息的显示与隐藏
             editDialogVisible: false,
             // 存储修改用户信息的表单
-            editForm:{},
+            editForm:[],
             // 修改用户信息表单的验证规则
             editFormRules:{
                 email: [
@@ -207,15 +232,22 @@ export default {
                     {required: true, message: '请输入手机号！', trigger: 'blur'},
                     {validator: cheakMobile, trigger: 'blur'}
                 ],
-            }
-
-           
+            },
+            // 控制分配角色的显示与隐藏
+            allotUserDialogVisible: false,
+            // 保存当前用户信息
+            userInfo: {},
+            // 分配新角色绑定的对象 -- 已选中的角色id
+            setNewUserId: '',
+            // 存放获取到的角色列表
+            allUserList: [],
         }
     },
     created() {
        this.getUserList();
     },
     methods: {
+        // 获取所有用户列表
         async getUserList() {
           const {data : res} = await this.service.get('users', {params : this.queryInfo});
           console.log(res)
@@ -315,6 +347,31 @@ export default {
             // 删除以后再重新获取列表数据
             this.getUserList();
         },
+        // 分配角色按钮
+        async setAllotDialog(userInfo) {
+            // 将当前的用户信息保存下来
+            this.userInfo = userInfo;
+            // 获取到角色列表
+            const {data:res} = await this.service.get('roles');
+            if(res.meta.status !== 200) return;
+            // 正确就将其存放到allUserList数组中
+            this.allUserList = res.data;
+
+            // 打开分配角色弹窗
+            this.allotUserDialogVisible = true;
+        },
+        // 点击按钮,分配新角色
+        async saveRoleName() {
+            // 判断用户有没有选择新角色
+            if(!this.setNewUserId) return this.$message.error("请选择新用户!");
+            const {data:res} = await this.service.put(`users/${this.userInfo.id}/role`, 
+            {rid : this.setNewUserId});
+            if(res.meta.status !== 200) return this.$message.error("分配新角色失败！");
+            this.getUserList();
+            // 关闭前清空新获取的id,便于下次使用
+            this.setNewUserId = '';
+            this.allotUserDialogVisible = false;
+        },
     },
 }
 </script>
@@ -327,6 +384,11 @@ export default {
        .el-pagination{
            margin-top: 20px;
            text-align: center;
+       }
+       .user_tit{
+           p{
+               padding-bottom: 20px;
+           }
        }
    }
 </style>

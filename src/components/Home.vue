@@ -143,8 +143,8 @@ export default {
             }
             }
         }
-        .le-main{
-            background: #e9edf1;
+        .el-main{
+            background-color: #e5e5f0;
         }
     }
 </style>
