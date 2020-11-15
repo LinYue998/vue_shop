@@ -88,11 +88,6 @@ export default {
             });
             this.menus = res.data;
             // console.log(this.menus)
-            this.$message({
-                message: res.meta.msg,
-                type: 'success',
-                duration: 1500
-            })
         },
 
         // 点击按钮，左侧菜单进行折叠或展开

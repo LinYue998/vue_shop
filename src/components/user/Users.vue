@@ -183,7 +183,7 @@ export default {
                 //当前页  
                 pagenum: 1,
                 //一页的条数   
-                pagesize: 2,
+                pagesize: 5,
             },
             //存放获取到的用户数据   
             usersList: [],
