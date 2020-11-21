@@ -299,7 +299,7 @@ export default {
         // 点击删除按钮，删除当前的分类
         async delCate(role) {
             // 为防止用户误操作，在删除前进行提示
-            const confirmData = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+            const confirmData = await this.$confirm('此操作将永久删除该分类名称, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
